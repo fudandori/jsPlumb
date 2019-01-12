@@ -1,0 +1,38 @@
+.draggable {
+    position: absolute;
+    cursor: move;
+}
+
+.customBox {
+    padding: 8px 100px;
+    box-shadow: 0 10px 40px 0 #B0C1D9;
+}
+
+a.button1 {
+    cursor: pointer;
+    display: inline-block;
+    padding: 0.35em 1.2em;
+    border: 0.1em solid blue;
+    margin: 0 0.3em 0.3em 0;
+    border-radius: 0.12em;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Lato';
+    font-weight: 300;
+    color: blue;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+a.button1:hover {
+    color: white;
+    background-color: blue;
+}
+
+@media all and (max-width:30em) {
+    a.button1 {
+        display: block;
+        margin: 0.4em auto;
+    }
+}
+
