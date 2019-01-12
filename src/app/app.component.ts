@@ -1,13 +1,13 @@
-import { Component, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, HostListener } from '@angular/core';
 import { jsPlumb } from 'jsplumb';
 
 const endPointOptions = {
   isSource: true,
   isTarget: true,
   maxConnections: -1,
-  endpoint: ["Dot", { radius: 5 }],
+  endpoint: ['Dot', { radius: 5 }],
   style: { fill: 'blue' },
-  connector: ["Bezier", { curviness: 150 }],
+  connector: ['Bezier', { curviness: 150 }],
   dropOptions: {
     drop: (e, ui) => {
       alert('Event: connection dropped!');
@@ -28,6 +28,9 @@ export class AppComponent implements AfterViewInit {
   title = 'jsPlumb';
   jsPlumbInstance;
   boxes = [{ name: 'Box 1' }, { name: 'Box 2' }, { name: 'Box 3' }];
+
+  origin: string = null;
+  target: string;
 
   constructor(el: ElementRef) {
 
@@ -51,10 +54,11 @@ export class AppComponent implements AfterViewInit {
     // Making elements draggable in bulk
     const els = document.querySelectorAll('.draggable');
     this.jsPlumbInstance.draggable(els);
-    this.jsPlumbInstance.addEndpoint(els, { anchor: 'Left' }, endPointOptions);
+    this.jsPlumbInstance.addEndpoint(els, { anchor: 'AutoDefault' }, endPointOptions);
 
     // Before drop event register
     this.jsPlumbInstance.bind('beforeDrop', (info) => {
+      console.log(info);
       let message = '';
       let res = false;
 
@@ -64,6 +68,7 @@ export class AppComponent implements AfterViewInit {
       if (denyConnection) {
         message = 'Denied!!';
       } else {
+
         message = document.getElementById(info.sourceId).innerText
           + ' linked to '
           + document.getElementById(info.targetId).innerText;
@@ -71,7 +76,7 @@ export class AppComponent implements AfterViewInit {
       }
 
       alert(message);
-      return res;
+      return false;
     });
 
     // Before Start Detach event register
@@ -84,6 +89,12 @@ export class AppComponent implements AfterViewInit {
       }
       return res;
     });
+
+    // before Drag event register
+    this.jsPlumbInstance.bind("beforeDrag", (params) => {
+      this.origin = params.sourceId;
+      return true;
+    });
   }
 
   add(index: number) {
@@ -93,9 +104,33 @@ export class AppComponent implements AfterViewInit {
 
     setTimeout(() => {
       this.jsPlumbInstance.draggable(id);
-      this.jsPlumbInstance.addEndpoint('box' + index.toString(), { anchor: 'Right' }, endPointOptions);
+      this.jsPlumbInstance.addEndpoint('box' + index.toString(), { anchor: 'AutoDefault' }, endPointOptions);
     }, 100);
   }
 
+  onMouseUp(event) {
+    if (origin !== null) {
+
+      const target = event.srcElement.attributes['id'].value;
+
+      this.jsPlumbInstance.connect({
+        source: this.origin,
+        target: target,
+        anchors: ['AutoDefault', 'AutoDefault'],
+        endpoint: ['Dot', { radius: 5 }],
+        style: { fill: 'blue' },
+        connector: ['Bezier', { curviness: 150 }]
+      });
+
+      this.origin = null;
+    }
+  }
+
+  @HostListener('window:mouseup', ['$event'])
+  mouseUp(event) {
+    console.log(event);
+
+
+  }
 
 }

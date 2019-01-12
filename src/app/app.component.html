@@ -4,7 +4,8 @@
     Add
   </a>
 
-  <div class="customBox draggable" [id]="'box' + i.toString()" *ngFor="let box of boxes;let i = index">
+  <div class="customBox draggable" [id]="'box' + i.toString()" *ngFor="let box of boxes;let i = index"
+  (mouseup)="onMouseUp($event)">
     {{box.name}}
   </div>
 </div>
