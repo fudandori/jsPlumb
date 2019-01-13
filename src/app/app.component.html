@@ -1,10 +1,18 @@
 <div class="container">
 
-  <a class="button1" (click)="add(boxes.length)">
-    Add
+  <a class="button1" (click)="addBox(boxes.length)">
+    Add Box
   </a>
 
-  <div class="customBox draggable" [id]="'box' + i.toString()" *ngFor="let box of boxes;let i = index">
+  <a class="button1" (click)="addRhombus(rhombi.length)">
+    Add Rhombus
+  </a>
+
+  <div class="box draggable" [id]="'box' + i.toString()" *ngFor="let box of boxes;let i = index">
     {{box.name}}
+  </div>
+
+  <div class="rhombus draggable" [id]="'rhombus' + i.toString()" *ngFor="let rhombus of rhombi;let i = index">
+    <div class="inner-rhombus"><p>{{rhombus.name}}</p></div>
   </div>
 </div>

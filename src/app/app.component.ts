@@ -1,19 +1,30 @@
-import { Component, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { jsPlumb } from 'jsplumb';
 
-const endPointOptions = {
+const sourcePointOptions = {
   isSource: true,
-  isTarget: true,
   maxConnections: -1,
   endpoint: ["Dot", { radius: 5 }],
-  style: { fill: 'blue' },
+  paintStyle: { fill: '#03396c' },
   connector: ["Bezier", { curviness: 150 }],
   dropOptions: {
     drop: (e, ui) => {
       alert('Event: connection dropped!');
     }
-  },
+  }
+};
 
+const targetPointOptions = {
+  isTarget: true,
+  maxConnections: -1,
+  endpoint: ["Dot", { radius: 5 }],
+  paintStyle: { fill: '#03396c' },
+  connector: ["Bezier", { curviness: 150 }],
+  dropOptions: {
+    drop: (e, ui) => {
+      alert('Event: connection dropped!');
+    }
+  }
 };
 
 @Component({
@@ -28,16 +39,13 @@ export class AppComponent implements AfterViewInit {
   title = 'jsPlumb';
   jsPlumbInstance;
   boxes = [{ name: 'Box 1' }, { name: 'Box 2' }, { name: 'Box 3' }];
-
-  constructor(el: ElementRef) {
-
-
-  }
+  rhombi = [{ name: 'Rhom 1' }];
 
   ngAfterViewInit(): void {
 
     //Starting positions
     document.getElementById('box0').style.top = '100px'
+    document.getElementById('rhombus0').style.top = '100px'
 
     document.getElementById('box1').style.top = '100px'
     document.getElementById('box1').style.left = '300px'
@@ -49,9 +57,17 @@ export class AppComponent implements AfterViewInit {
     this.jsPlumbInstance = jsPlumb.getInstance();
 
     // Making elements draggable in bulk
-    const els = document.querySelectorAll('.draggable');
-    this.jsPlumbInstance.draggable(els);
-    this.jsPlumbInstance.addEndpoint(els, { anchor: 'Left' }, endPointOptions);
+    const drags = document.querySelectorAll('.draggable');
+    this.jsPlumbInstance.draggable(drags);
+
+    // Endpoints generation
+    const boxes = document.getElementsByClassName('box draggable');
+    this.jsPlumbInstance.addEndpoint(boxes, { anchor: 'Top' }, targetPointOptions);
+    this.jsPlumbInstance.addEndpoint(boxes, { anchor: 'Bottom' }, sourcePointOptions);
+
+    this.jsPlumbInstance.addEndpoint('rhombus0', { anchors: 'Left' }, sourcePointOptions);
+    this.jsPlumbInstance.addEndpoint('rhombus0', { anchors: 'Right' }, sourcePointOptions);
+    this.jsPlumbInstance.addEndpoint('rhombus0', { anchor: 'Top' }, targetPointOptions);
 
     // Before drop event register
     this.jsPlumbInstance.bind('beforeDrop', (info) => {
@@ -86,16 +102,28 @@ export class AppComponent implements AfterViewInit {
     });
   }
 
-  add(index: number) {
+  addBox(index: number) {
     const id = 'box' + index.toString();
 
     this.boxes.push({ name: ('Box ' + (index + 1).toString()) });
 
     setTimeout(() => {
       this.jsPlumbInstance.draggable(id);
-      this.jsPlumbInstance.addEndpoint('box' + index.toString(), { anchor: 'Right' }, endPointOptions);
+      this.jsPlumbInstance.addEndpoint(id, { anchor: 'Top' }, targetPointOptions);
+      this.jsPlumbInstance.addEndpoint(id, { anchor: 'Bottom' }, sourcePointOptions);
     }, 100);
   }
 
+  addRhombus(index: number) {
+    const id = 'rhombus' + index.toString();
 
+    this.rhombi.push({ name: ('Rhom ' + (index + 1).toString()) });
+
+    setTimeout(() => {
+      this.jsPlumbInstance.draggable(id);
+      this.jsPlumbInstance.addEndpoint(id, { anchor: 'Right' }, sourcePointOptions);
+      this.jsPlumbInstance.addEndpoint(id, { anchor: 'Left' }, sourcePointOptions);
+      this.jsPlumbInstance.addEndpoint(id, { anchor: 'Top' }, targetPointOptions);
+    }, 100);
+  }
 }
